@@ -807,41 +807,28 @@ function setLoadMsg(msg) {
 async function bootApp() {
   showDBLoading(true);
   setLoadMsg('Conectando...');
-
   await waitForFB();
 
-  // Habilita persistência offline
-  // Primeiro aguarda saber se usuário está logado
   window._auth.onAuthStateChanged(async (firebaseUser) => {
     if (firebaseUser) {
       setLoadMsg('Carregando dados...');
       try {
-        // Carrega tudo em paralelo
         const [fbUsers, fbPosts, fbVerified, snapUser] = await Promise.all([
-          fbLoadUsers(),
-          fbLoadPosts(),
-          fbLoadVerified(),
+          fbLoadUsers(), fbLoadPosts(), fbLoadVerified(),
           window._db.collection('users').doc(firebaseUser.uid).get()
         ]);
-        accounts      = fbUsers;
-        posts         = fbPosts;
-        verifiedUsers = fbVerified;
-        allUsernames  = accounts.map(a => a.username);
-        ensureDefaults();
-        migrateComments();
-
+        accounts = fbUsers; posts = fbPosts; verifiedUsers = fbVerified;
+        allUsernames = accounts.map(a => a.username);
+        ensureDefaults(); migrateComments();
         if (snapUser.exists) {
-          currentUser = snapUser.data();
-          isLoggedIn = true;
-          LS.set('currentUser', currentUser);
-          LS.set('isLoggedIn', true);
+          currentUser = snapUser.data(); isLoggedIn = true;
+          LS.set('currentUser', currentUser); LS.set('isLoggedIn', true);
           showDBLoading(false);
           document.getElementById('authScreen').classList.add('hidden');
           document.getElementById('setupScreen').classList.remove('active');
           initApp();
           fbListenPosts(ps => { posts = ps; loadFeed(); loadExploreGrid(); });
         } else {
-          // Logado no Google mas sem perfil — pede username
           showDBLoading(false);
           window._pendingGoogleUser = firebaseUser;
           document.getElementById('authScreen').classList.add('hidden');
@@ -850,25 +837,16 @@ async function bootApp() {
       } catch(e) {
         showDBLoading(false);
         document.getElementById('authScreen').classList.remove('hidden');
-        console.error('Erro ao carregar dados:', e);
       }
     } else {
-      // Não logado — mostra tela de login
-      setLoadMsg('Carregando posts...');
-      try {
-        const [fbUsers, fbPosts, fbVerified] = await Promise.all([
-          fbLoadUsers(), fbLoadPosts(), fbLoadVerified()
-        ]);
-        accounts = fbUsers; posts = fbPosts; verifiedUsers = fbVerified;
-        allUsernames = accounts.map(a => a.username);
-        ensureDefaults(); migrateComments();
-      } catch(e) {}
+      // Sem login — só mostra tela de auth, não tenta buscar nada
       showDBLoading(false);
       document.getElementById('authScreen').classList.remove('hidden');
     }
   });
 }
 bootApp();
+
 
 
 // ===== STATE =====
