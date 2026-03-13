@@ -805,52 +805,72 @@ function setLoadMsg(msg) {
 // ===== BOOT COM FIREBASE =====
 async function bootApp() {
   showDBLoading(true);
-  setLoadMsg('Conectando ao Firebase...');
+  setLoadMsg('Conectando...');
 
   await waitForFB();
 
-  setLoadMsg('Carregando dados...');
+  // Habilita persistência offline
+  try { await window._db.enablePersistence(); } catch(e) {}
 
-  const [fbUsers, fbPosts, fbVerified] = await Promise.all([
-    fbLoadUsers(),
-    fbLoadPosts(),
-    fbLoadVerified()
-  ]);
-
-  accounts      = fbUsers;
-  posts         = fbPosts;
-  verifiedUsers = fbVerified;
-  allUsernames  = accounts.map(a => a.username);
-
-  showDBLoading(false);
-  ensureDefaults();
-  migrateComments();
-
+  // Primeiro aguarda saber se usuário está logado
   window._auth.onAuthStateChanged(async (firebaseUser) => {
     if (firebaseUser) {
-      const snap = await window._db.collection('users').doc(firebaseUser.uid).get();
-      if (snap.exists) {
-        currentUser = snap.data();
-        isLoggedIn = true;
-        LS.set('currentUser', currentUser);
-        LS.set('isLoggedIn', true);
-        document.getElementById('authScreen').classList.add('hidden');
-        document.getElementById('setupScreen').classList.remove('active');
-        initApp();
-        fbListenPosts(ps => { posts = ps; loadFeed(); loadExploreGrid(); });
-      } else {
+      setLoadMsg('Carregando dados...');
+      try {
+        // Carrega tudo em paralelo
+        const [fbUsers, fbPosts, fbVerified, snapUser] = await Promise.all([
+          fbLoadUsers(),
+          fbLoadPosts(),
+          fbLoadVerified(),
+          window._db.collection('users').doc(firebaseUser.uid).get()
+        ]);
+        accounts      = fbUsers;
+        posts         = fbPosts;
+        verifiedUsers = fbVerified;
+        allUsernames  = accounts.map(a => a.username);
+        ensureDefaults();
+        migrateComments();
+
+        if (snapUser.exists) {
+          currentUser = snapUser.data();
+          isLoggedIn = true;
+          LS.set('currentUser', currentUser);
+          LS.set('isLoggedIn', true);
+          showDBLoading(false);
+          document.getElementById('authScreen').classList.add('hidden');
+          document.getElementById('setupScreen').classList.remove('active');
+          initApp();
+          fbListenPosts(ps => { posts = ps; loadFeed(); loadExploreGrid(); });
+        } else {
+          // Logado no Google mas sem perfil — pede username
+          showDBLoading(false);
+          window._pendingGoogleUser = firebaseUser;
+          document.getElementById('authScreen').classList.add('hidden');
+          document.getElementById('setupScreen').classList.add('active');
+        }
+      } catch(e) {
+        showDBLoading(false);
         document.getElementById('authScreen').classList.remove('hidden');
+        console.error('Erro ao carregar dados:', e);
       }
     } else {
-      isLoggedIn = false;
-      currentUser = null;
-      LS.rm('currentUser');
-      LS.rm('isLoggedIn');
+      // Não logado — mostra tela de login
+      setLoadMsg('Carregando posts...');
+      try {
+        const [fbUsers, fbPosts, fbVerified] = await Promise.all([
+          fbLoadUsers(), fbLoadPosts(), fbLoadVerified()
+        ]);
+        accounts = fbUsers; posts = fbPosts; verifiedUsers = fbVerified;
+        allUsernames = accounts.map(a => a.username);
+        ensureDefaults(); migrateComments();
+      } catch(e) {}
+      showDBLoading(false);
       document.getElementById('authScreen').classList.remove('hidden');
     }
   });
 }
 bootApp();
+
 
 // ===== STATE =====
 let accounts      = [];
