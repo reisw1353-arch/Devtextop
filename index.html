@@ -16,6 +16,7 @@
   firebase.initializeApp(cfg);
   window._auth=firebase.auth();
   window._db=firebase.firestore();
+  window._db.settings({ experimentalForceLongPolling: true, merge: true });
 })();
 </script>
 <style>
@@ -810,8 +811,6 @@ async function bootApp() {
   await waitForFB();
 
   // Habilita persistência offline
-  try { await window._db.enablePersistence(); } catch(e) {}
-
   // Primeiro aguarda saber se usuário está logado
   window._auth.onAuthStateChanged(async (firebaseUser) => {
     if (firebaseUser) {
