@@ -5,19 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>devtexto</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- Firebase compat v9 -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-(function(){
-  var cfg={apiKey:"AIzaSyBFqlFznLw5wJkFr_MaqcvF9xsbW66pHb0",authDomain:"drama-b829c.firebaseapp.com",projectId:"drama-b829c",storageBucket:"drama-b829c.firebasestorage.app",messagingSenderId:"665624159793",appId:"1:665624159793:web:121de8a03b2f804d88d710"};
-  if(typeof firebase==='undefined'){document.write('<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0f;color:#ef4444;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:14px;text-align:center;padding:20px;z-index:99999">❌ Erro ao carregar Firebase.<br>Verifique sua conexão com a internet e recarregue a página.</div>');return;}
-  firebase.initializeApp(cfg);
-  window._auth=firebase.auth();
-  // Firestore SDK não usado - usando REST API
-})();
-</script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3a;--accent:#7c3aed;--accent2:#ec4899;--text:#f0f0f8;--muted:#888899;--gold:#f59e0b}
@@ -341,25 +329,23 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
     <div class="auth-logo">📝</div>
     <div class="auth-title">devtexto</div>
     <div class="auth-subtitle">Compartilhe suas histórias e ideias</div>
-    <div id="authError" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#f87171;font-size:13px;display:none;text-align:left"></div>
-    <button class="auth-btn" id="googleLoginBtn" onclick="handleGoogleLogin()" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#333;border:1px solid #ddd;font-size:15px;margin-bottom:12px">
+    <div id="authError" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#f87171;font-size:13px;display:none"></div>
+    <button onclick="handleGoogleLogin()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#333;border:1px solid #ddd;border-radius:12px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:12px">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Entrar com Google
     </button>
-    <div style="font-size:11px;color:var(--muted);margin-top:8px">Na primeira vez, você vai escolher seu @username</div>
+    <div style="font-size:11px;color:var(--muted)">Na primeira vez você escolhe seu @username</div>
   </div>
 </div>
-
-<!-- SETUP -->
 <div id="setupScreen" class="setup-screen">
   <div class="setup-box">
-    <div class="setup-title">Escolha seu @username</div>
-    <div class="setup-subtitle">Será seu nome único no devtexto</div>
+    <div class="setup-title">Finalize seu Perfil</div>
+    <div class="setup-subtitle">Escolha seu @username</div>
     <form id="setupForm">
       <div class="form-group">
         <label class="form-label">@Username *</label>
-        <input type="text" class="form-input" id="setupUsernameInput" placeholder="meu_usuario" autocomplete="off" pattern="[a-z0-9_]+" required style="margin-bottom:4px">
-        <div style="font-size:11px;color:var(--muted)">Apenas letras minúsculas, números e _</div>
+        <input type="text" class="form-input" id="setupUsername" placeholder="meu_usuario" autocomplete="off" required>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Só letras minúsculas, números e _</div>
       </div>
       <div class="form-group">
         <label class="form-label">Foto de Perfil</label>
@@ -706,218 +692,136 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
     <button class="close-admin-btn" id="closeAdminPanelBtn">Fechar Painel</button>
   </div>
 </div>
-<!-- Firebase SDK -->
-
 <script>
-// ===== ARMAZENAMENTO LOCAL (cache apenas) =====
+// ===== FIREBASE =====
+(function(){
+  const s1=document.createElement('script');
+  s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+  s1.onload=function(){
+    const s2=document.createElement('script');
+    s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
+    s2.onload=function(){
+      firebase.initializeApp({apiKey:"AIzaSyBFqlFznLw5wJkFr_MaqcvF9xsbW66pHb0",authDomain:"drama-b829c.firebaseapp.com",projectId:"drama-b829c",storageBucket:"drama-b829c.firebasestorage.app",messagingSenderId:"665624159793",appId:"1:665624159793:web:121de8a03b2f804d88d710"});
+      window._auth=firebase.auth();
+      window._fbReady=true;
+      document.dispatchEvent(new Event('fb-ready'));
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+})();
+// ===== ARMAZENAMENTO LOCAL =====
 const LS = {
   get: k => { try { const d = localStorage.getItem('dt_' + k); return d ? JSON.parse(d) : null; } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem('dt_' + k, JSON.stringify(v)); } catch {} },
   rm: k => localStorage.removeItem('dt_' + k)
 };
 
-// ===== AGUARDAR FIREBASE (resolve tanto se module carregou antes ou depois) =====
-// Firebase compat já carregado no head
-function waitForFB() {
-
-  return Promise.resolve();
+// ===== FIRESTORE REST API =====
+const _FS='https://firestore.googleapis.com/v1/projects/drama-b829c/databases/(default)/documents';
+async function _tok(){try{return await window._auth.currentUser?.getIdToken();}catch(e){return null;}}
+function _h(t,ct){const h={};if(t)h['Authorization']='Bearer '+t;if(ct)h['Content-Type']='application/json';return h;}
+function _v2j(fields){
+  if(!fields)return{};const o={};
+  for(const[k,v]of Object.entries(fields)){
+    if(v.stringValue!==undefined)o[k]=v.stringValue;
+    else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);
+    else if(v.doubleValue!==undefined)o[k]=v.doubleValue;
+    else if(v.booleanValue!==undefined)o[k]=v.booleanValue;
+    else if(v.nullValue!==undefined)o[k]=null;
+    else if(v.arrayValue!==undefined)o[k]=(v.arrayValue.values||[]).map(i=>_v2j({_:i})['_']);
+    else if(v.mapValue!==undefined)o[k]=_v2j(v.mapValue.fields||{});
+    else o[k]=null;
+  }return o;
 }
-
-// ===== FIRESTORE REST API (sem SDK, sem bug offline) =====
-const FB_PROJECT = 'drama-b829c';
-const FB_BASE = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
-
-async function fbToken() {
-  try { return await window._auth.currentUser?.getIdToken(); } catch(e) { return null; }
+function _j2v(v){
+  if(v===null||v===undefined)return{nullValue:null};
+  if(typeof v==='boolean')return{booleanValue:v};
+  if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};
+  if(typeof v==='string')return{stringValue:v};
+  if(Array.isArray(v))return{arrayValue:{values:v.map(_j2v)}};
+  if(typeof v==='object'){const f={};for(const[k,val]of Object.entries(v))f[k]=_j2v(val);return{mapValue:{fields:f}};}
+  return{stringValue:String(v)};
 }
-
-function fsToJs(fields) {
-  if (!fields) return {};
-  const obj = {};
-  for (const [k, v] of Object.entries(fields)) {
-    if (v.stringValue !== undefined) obj[k] = v.stringValue;
-    else if (v.integerValue !== undefined) obj[k] = Number(v.integerValue);
-    else if (v.doubleValue !== undefined) obj[k] = v.doubleValue;
-    else if (v.booleanValue !== undefined) obj[k] = v.booleanValue;
-    else if (v.nullValue !== undefined) obj[k] = null;
-    else if (v.arrayValue !== undefined) obj[k] = (v.arrayValue.values||[]).map(i=>fsToJs({_:i})['_']);
-    else if (v.mapValue !== undefined) obj[k] = fsToJs(v.mapValue.fields||{});
-    else obj[k] = null;
-  }
-  return obj;
+function _fields(obj){const f={};for(const[k,v]of Object.entries(obj))f[k]=_j2v(v);return f;}
+async function fsGet(col,id){
+  const t=await _tok();
+  const r=await fetch(`${_FS}/${col}/${id}`,{headers:_h(t)});
+  if(!r.ok)return null;const d=await r.json();return d.fields?_v2j(d.fields):null;
 }
-
-function jsToFs(obj) {
-  if (obj === null || obj === undefined) return { nullValue: null };
-  if (typeof obj === 'boolean') return { booleanValue: obj };
-  if (typeof obj === 'number') return Number.isInteger(obj) ? { integerValue: String(obj) } : { doubleValue: obj };
-  if (typeof obj === 'string') return { stringValue: obj };
-  if (Array.isArray(obj)) return { arrayValue: { values: obj.map(jsToFs) } };
-  if (typeof obj === 'object') {
-    const fields = {};
-    for (const [k,v] of Object.entries(obj)) fields[k] = jsToFs(v);
-    return { mapValue: { fields } };
-  }
-  return { stringValue: String(obj) };
+async function fsList(col){
+  const t=await _tok();
+  const r=await fetch(`${_FS}/${col}?pageSize=500`,{headers:_h(t)});
+  if(!r.ok)return[];const d=await r.json();
+  return(d.documents||[]).map(doc=>_v2j(doc.fields||{}));
 }
-
-function objToFsFields(obj) {
-  const fields = {};
-  for (const [k,v] of Object.entries(obj)) fields[k] = jsToFs(v);
-  return fields;
-}
-
-async function fsGet(col, docId) {
-  const token = await fbToken();
-  const headers = token ? { Authorization: 'Bearer ' + token } : {};
-  const r = await fetch(`${FB_BASE}/${col}/${docId}`, { headers });
-  if (!r.ok) return null;
-  const d = await r.json();
-  return d.fields ? fsToJs(d.fields) : null;
-}
-
-async function fsList(col) {
-  const token = await fbToken();
-  const headers = token ? { Authorization: 'Bearer ' + token } : {};
-  const r = await fetch(`${FB_BASE}/${col}?pageSize=500`, { headers });
-  if (!r.ok) return [];
-  const d = await r.json();
-  return (d.documents||[]).map(doc => fsToJs(doc.fields||{}));
-}
-
-async function fsSet(col, docId, obj) {
-  const token = await fbToken();
-  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) };
-  const fields = objToFsFields(obj);
-  const r = await fetch(`${FB_BASE}/${col}/${docId}`, {
-    method: 'PATCH', headers, body: JSON.stringify({ fields })
-  });
+async function fsSet(col,id,obj){
+  const t=await _tok();
+  const r=await fetch(`${_FS}/${col}/${id}`,{method:'PATCH',headers:_h(t,true),body:JSON.stringify({fields:_fields(obj)})});
   return r.ok;
 }
+async function fsDel(col,id){const t=await _tok();await fetch(`${_FS}/${col}/${id}`,{method:'DELETE',headers:_h(t)});}
 
-async function fsDelete(col, docId) {
-  const token = await fbToken();
-  const headers = token ? { Authorization: 'Bearer ' + token } : {};
-  await fetch(`${FB_BASE}/${col}/${docId}`, { method: 'DELETE', headers });
-}
-
-async function fbSavePost(post) {
-  try { await fsSet('posts', String(post.id), post); } catch(e) { console.error(e); }
-}
-async function fbDeletePost(postId) {
-  try { await fsDelete('posts', String(postId)); } catch(e) {}
-}
-async function fbSaveUser(acc) {
-  try { await fsSet('users', acc.id || acc.username, JSON.parse(JSON.stringify(acc))); } catch(e) { console.error(e); }
-}
-async function fbSaveVerified() {
-  try { await fsSet('meta', 'verified', { list: verifiedUsers }); } catch(e) {}
-}
-async function fbLoadPosts() {
-  try {
-    const ps = await fsList('posts');
-    return ps.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-  } catch(e) { return []; }
-}
-async function fbLoadUsers() {
-  try { return await fsList('users'); } catch(e) { return []; }
-}
-async function fbLoadVerified() {
-  try {
-    const d = await fsGet('meta', 'verified');
-    return d?.list || [];
-  } catch(e) { return []; }
-}
-async function fbGetUser(uid) {
-  return await fsGet('users', uid);
-}
-function fbListenPosts(cb) {
-  // REST não tem realtime — polling a cada 15s
-  cb && fbLoadPosts().then(cb);
-  return setInterval(() => fbLoadPosts().then(cb), 15000);
-}
-
-let _saveTimer = null;
-function scheduleSave() {
-  // No Firebase mode, saves happen immediately per-item
-}
-function saveAccounts()  { accounts.forEach(a => fbSaveUser(a)); }
-function savePosts()     { posts.forEach(p => fbSavePost(p)); }
-function saveVerified()  { fbSaveVerified(); }
-function saveUsernames() { /* usernames controlados pelos docs de user */ }
+function saveAccounts(){accounts.forEach(a=>{if(a?.id)fsSet('users',a.id,a);});}
+function savePosts(){posts.forEach(p=>{if(p?.id)fsSet('posts',String(p.id),p);});}
+function saveVerified(){fsSet('meta','verified',{list:verifiedUsers});}
+function saveUsernames(){}
+function scheduleSave(){}
 
 // ===== TELA DE CARREGAMENTO =====
-function showDBLoading(show) {
-  let el = document.getElementById('dbLoad');
-  if (!el) {
-    el = document.createElement('div'); el.id = 'dbLoad';
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:88888;transition:opacity .5s';
-    el.innerHTML = '<div style="font-size:52px;margin-bottom:18px;animation:dbSpin 1.2s linear infinite">⚙️</div>'
-      + '<div style="font-family:\'Playfair Display\',serif;font-size:24px;font-weight:900;background:linear-gradient(135deg,#7c3aed,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">devtexto</div>'
-      + '<div style="font-size:13px;color:#666;letter-spacing:2px" id="dbLoadMsg">Conectando...</div>'
-      + '<style>@keyframes dbSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>';
-    document.body.appendChild(el);
-  }
-  if (show) { el.style.display = 'flex'; el.style.opacity = '1'; }
-  else { el.style.opacity = '0'; setTimeout(() => { if(el) el.style.display = 'none'; }, 500); }
+function showDBLoading(show){
+  let el=document.getElementById('dbLoad');
+  if(!el){el=document.createElement('div');el.id='dbLoad';
+    el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:88888;transition:opacity .5s';
+    el.innerHTML='<div style="font-size:52px;margin-bottom:18px;animation:sp 1.2s linear infinite">⚙️</div>'
+      +'<div style="font-family:Playfair Display,serif;font-size:24px;font-weight:900;background:linear-gradient(135deg,#7c3aed,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">devtexto</div>'
+      +'<div style="font-size:13px;color:#666;letter-spacing:2px" id="dbMsg">Carregando...</div>'
+      +'<style>@keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>';
+    document.body.appendChild(el);}
+  if(show){el.style.display='flex';el.style.opacity='1';}
+  else{el.style.opacity='0';setTimeout(()=>{if(el)el.style.display='none';},500);}
 }
+function setLoadMsg(msg){const e=document.getElementById('dbMsg');if(e)e.textContent=msg;}
 
-function setLoadMsg(msg) {
-  const el = document.getElementById('dbLoadMsg');
-  if (el) el.textContent = msg;
-}
-
-// ===== BOOT COM FIREBASE =====
-async function bootApp() {
-  showDBLoading(true);
-  setLoadMsg('Conectando...');
-  await waitForFB();
-
-  window._auth.onAuthStateChanged(async (firebaseUser) => {
-    if (firebaseUser) {
-      // Tenta usar cache local primeiro para ser rápido
-      const cached = LS.get('currentUser');
-      if (cached && cached.id === firebaseUser.uid) {
-        currentUser = cached; isLoggedIn = true;
-        showDBLoading(false);
-        document.getElementById('authScreen').classList.add('hidden');
-        initApp();
-        // Carrega dados em background
-        Promise.all([fbLoadUsers(),fbLoadPosts(),fbLoadVerified()]).then(([u,p,v])=>{
-          accounts=u;posts=p;verifiedUsers=v;allUsernames=u.map(a=>a.username);
-          loadFeed();loadExploreGrid();
-          fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
-        }).catch(()=>{});
-        return;
-      }
+// ===== BOOT =====
+async function bootApp(){
+  showDBLoading(true);setLoadMsg('Conectando...');
+  // Aguarda Firebase carregar
+  await new Promise(resolve=>{
+    if(window._fbReady)return resolve();
+    document.addEventListener('fb-ready',resolve,{once:true});
+  });
+  window._auth.onAuthStateChanged(async(fbUser)=>{
+    if(fbUser){
       setLoadMsg('Carregando dados...');
-      try {
-        const [fbUsers, fbPosts, fbVerified, snapUser] = await Promise.all([
-          fbLoadUsers(), fbLoadPosts(), fbLoadVerified(),
-          fbGetUser(firebaseUser.uid)
-        ]);
-        accounts=fbUsers; posts=fbPosts; verifiedUsers=fbVerified;
-        allUsernames=accounts.map(a=>a.username);
-        ensureDefaults(); migrateComments();
-        if (snapUser) {
-          currentUser=snapUser; isLoggedIn=true;
-          LS.set('currentUser',currentUser); LS.set('isLoggedIn',true);
+      try{
+        const userData=await fsGet('users',fbUser.uid);
+        if(!userData){
           showDBLoading(false);
-          document.getElementById('authScreen').classList.add('hidden');
-          document.getElementById('setupScreen').classList.remove('active');
-          initApp();
-          fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
-        } else {
-          showDBLoading(false);
-          window._pendingGoogleUser=firebaseUser;
+          window._pendingGoogleUser=fbUser;
           document.getElementById('authScreen').classList.add('hidden');
           document.getElementById('setupScreen').classList.add('active');
+          return;
         }
-      } catch(e) {
+        const[fbUsers,fbPosts,fbMeta]=await Promise.all([fsList('users'),fsList('posts'),fsGet('meta','verified')]);
+        accounts=fbUsers;
+        posts=fbPosts.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+        verifiedUsers=fbMeta?.list||[];
+        allUsernames=accounts.map(a=>a.username).filter(Boolean);
+        currentUser=userData;isLoggedIn=true;
+        LS.set('currentUser',currentUser);
         showDBLoading(false);
-        document.getElementById('authScreen').classList.remove('hidden');
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('setupScreen').classList.remove('active');
+        ensureDefaults();migrateComments();initApp();
+        setInterval(async()=>{
+          try{const ps=await fsList('posts');posts=ps.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));loadFeed();}catch(e){}
+        },20000);
+      }catch(e){
+        console.error('bootApp error:',e);
+        showDBLoading(false);document.getElementById('authScreen').classList.remove('hidden');
       }
-    } else {
+    }else{
       showDBLoading(false);
       document.getElementById('authScreen').classList.remove('hidden');
     }
@@ -925,16 +829,14 @@ async function bootApp() {
 }
 bootApp();
 
-
-
 // ===== STATE =====
 let accounts      = [];
-let currentUser   = LS.get('currentUser') || null;
-let isLoggedIn    = false;
+let currentUser   = LS.get('currentUser');
+let isLoggedIn    = LS.get('isLoggedIn') || false;
 let allUsernames  = [];
 let verifiedUsers = [];
 let posts         = [];
-let notifications = LS.get('notifs') || [];
+let notifications = LS.get('noifs') || [];
 const RND_NAMES=['lucas','pedro','gabriel','rafael','bruno','carlos','julia','mariana','beatriz','camila','amanda','jessica','thiago','rodrigo','fernanda','guilherme','leandro','roberta','tatiana','andre','daniela','eduardo','fabiana','henrique','isabela'];
 const RND_AVATARS=['👨','👩','👦','👧','🧑','🧔','👱','🧑‍🦰','👨‍💼','👩‍💼','🧑‍🎨','👨‍🏫'];
 const RND_COMMENTS=['Muito bom! 😍','Adorei esse texto! ❤️','Incrível! 🔥','Concordo totalmente! 👏','Isso me fez pensar muito ✨','Parabéns pelo post! 🎉','Salvei para ler de novo 📌','Que perspectiva interessante!','Top demais! 💯','Compartilhando com todo mundo! 🚀','Que texto incrível!','Me identifiquei muito com isso 💙','Obrigado por compartilhar!','Continuei pensando nisso o dia todo...','Faz muito sentido! 👍','muito bom','ficou dahora'];
@@ -970,7 +872,7 @@ function ensureDefaults(){
      image:null,likes:891,comments:[{id:2,author:'maria',authorAvatar:'👩',authorPhoto:null,displayName:'Maria',text:'Que lindo relato! ❤️',time:'5h atrás',likes:8,likedBy:[],replies:[]}],
      shares:67,views:3200,likedBy:[],viewedBy:[],timestamp:new Date(Date.now()-3600000*20).toISOString()}
   ];
-  fbSavePost(post);
+  savePosts();
 }
 function migrateComments(){
   posts.forEach(post=>{
@@ -981,35 +883,37 @@ function migrateComments(){
       if(c.likes===undefined)c.likes=0;
     });
   });
-  fbSavePost(post);
+  savePosts();
 }
-// ===== GOOGLE AUTH =====
-async function handleGoogleLogin(){
-  const btn=document.getElementById('googleLoginBtn');
-  const errEl=document.getElementById('authError');
-  errEl.style.display='none';
-  btn.disabled=true;btn.textContent='Entrando...';
-  try {
-    const provider=new firebase.auth.GoogleAuthProvider();
-    const result=await window._auth.signInWithPopup(provider);
-    const gu=result.user;
-    const snap=await fbGetUser(gu.uid);
-    if(!snap){
-      window._pendingGoogleUser=gu;
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('setupScreen').classList.add('active');
-    }
-    // se existe, onAuthStateChanged cuida
-  } catch(e){
-    errEl.textContent='Erro: '+e.message;errEl.style.display='block';
-    btn.disabled=false;btn.textContent='Entrar com Google';
-  }
-}
-function switchAuthTab(){}
-async function handleRegister(){}
-async function handleLogin(){}
-function showAuthErr(el,msg){if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3500);}}
 
+
+function handleRegister(){
+  const username=document.getElementById('regUsername').value.trim().toLowerCase().replace('@','');
+  const displayName=document.getElementById('regDisplayName').value.trim();
+  const password=document.getElementById('regPassword').value;
+  const errEl=document.getElementById('registerError');
+  errEl.style.display='none';
+  if(!username||!displayName||!password){showAuthErr(errEl,'Preencha todos os campos!');return}
+  if(!/^[a-z0-9_]+$/.test(username)){showAuthErr(errEl,'Nome de usuário: apenas letras, números e _');return}
+  if(password.length<4){showAuthErr(errEl,'Senha precisa ter ao menos 4 caracteres');return}
+  if(allUsernames.includes(username)){showAuthErr(errEl,'Nome de usuário já está em uso!');return}
+  window._pendingAccount={id:'u_'+Date.now(),username,displayName,password,avatar:'👤',avatarPhoto:null,bio:'',following:[],followers:[]};
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('setupScreen').classList.add('active');
+}
+
+function handleLogin(){
+  const username=document.getElementById('loginUsername').value.trim().toLowerCase().replace('@','');
+  const password=document.getElementById('loginPassword').value;
+  const errEl=document.getElementById('loginError');
+  errEl.style.display='none';
+  if(!username||!password){showAuthErr(errEl,'Preencha usuário e senha!');return}
+  const acc=accounts.find(a=>a.username===username&&a.password===password);
+  if(!acc){showAuthErr(errEl,'Usuário ou senha incorretos!');return}
+  finalizeLogin(acc);
+}
+
+function showAuthErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3500);}
 
 document.getElementById('setupAvatarInput').addEventListener('change',function(e){
   const file=e.target.files[0];if(!file||!file.type.startsWith('image/'))return;
@@ -1025,30 +929,26 @@ document.getElementById('setupAvatarInput').addEventListener('change',function(e
 
 document.getElementById('setupForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  const gu=window._pendingGoogleUser;if(!gu)return;
-  const usernameEl=document.getElementById('setupUsernameInput');
-  const username=(usernameEl?usernameEl.value.trim().toLowerCase().replace('@',''):'').replace(/[^a-z0-9_]/g,'')||'user'+Date.now();
-  const avatar=document.getElementById('setupAvatar')?.value.trim()||'👤';
-  const bio=document.getElementById('setupBio')?.value.trim()||'Bem-vindo ao devtexto! 📝';
-  if(!/^[a-z0-9_]+$/.test(username)){alert('Username inválido! Use apenas letras, números e _');return}
-  if(allUsernames.includes(username)){alert('Username já em uso! Escolha outro.');return}
-  const acc={id:gu.uid,username,displayName:gu.displayName||username,avatar,avatarPhoto:gu.photoURL||null,bio,following:[],followers:[],_email:gu.email};
+  const gu=window._pendingGoogleUser;
+  if(!gu){alert('Sessão perdida. Faça login de novo.');return;}
+  const username=(document.getElementById('setupUsername')?.value||'').trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  if(!username||username.length<3){alert('Username inválido! Mínimo 3 letras.');return;}
+  if(allUsernames.includes(username)){alert('Username já em uso! Escolha outro.');return;}
+  const avatar=(document.getElementById('setupAvatar')?.value||'').trim()||'👤';
+  const bio=(document.getElementById('setupBio')?.value||'').trim()||'Bem-vindo ao devtexto! 📝';
+  const acc={id:gu.uid,username,displayName:gu.displayName||username,avatar,avatarPhoto:gu.photoURL||null,bio,following:[],followers:[],_email:gu.email||''};
   if(window._setupAvatarPhoto){acc.avatarPhoto=window._setupAvatarPhoto;window._setupAvatarPhoto=null;}
-  try {
-    await fsSet('users', gu.uid, acc);
-    accounts.push(acc);allUsernames.push(username);
-    document.getElementById('setupScreen').classList.remove('active');
-    window._pendingGoogleUser=null;
-    // Faz login imediatamente
-    currentUser=acc;isLoggedIn=true;
-    LS.set('currentUser',acc);LS.set('isLoggedIn',true);
-    initApp();
-    fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
-  } catch(e2){
-    alert('Erro ao salvar perfil: '+e2.message);
-  }
+  const ok=await fsSet('users',gu.uid,acc);
+  if(!ok){alert('Erro ao salvar. Tente de novo.');return;}
+  accounts.push(acc);allUsernames.push(username);
+  currentUser=acc;isLoggedIn=true;LS.set('currentUser',acc);
+  window._pendingGoogleUser=null;
+  document.getElementById('setupScreen').classList.remove('active');
+  ensureDefaults();migrateComments();initApp();
+  setInterval(async()=>{
+    try{const ps=await fsList('posts');posts=ps.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));loadFeed();}catch(e){}
+  },20000);
 });
-
 
 function finalizeLogin(acc){
   currentUser=acc;isLoggedIn=true;
@@ -1057,11 +957,26 @@ function finalizeLogin(acc){
   setTimeout(initApp,100);
 }
 
+// ===== AUTH GOOGLE =====
+async function handleGoogleLogin(){
+  const errEl=document.getElementById('authError');
+  if(errEl)errEl.style.display='none';
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    await window._auth.signInWithPopup(provider);
+  }catch(e){
+    if(errEl){errEl.textContent='Erro: '+e.message;errEl.style.display='block';}
+  }
+}
+
+function handleLogin(){}
+function handleRegister(){}
+function finalizeLogin(acc){currentUser=acc;isLoggedIn=true;LS.set('currentUser',acc);initApp();}
+
+
 // ===== BOOT COM CLOUD =====
 
 function initApp(){
-  if(!currentUser){console.error('initApp sem currentUser!');return;}
-  if(!currentUser.username)currentUser.username=currentUser.id||'usuario';
   loadFeed();renderNotifications();renderProfile(currentUser.username);
   loadExploreGrid();switchPage('home');updateNotifBadge();
 }
@@ -1297,14 +1212,14 @@ function toggleLike(postId,btn){
     if(post.author!==currentUser.username)pushNotif('like',currentUser.displayName,post.id,post.title.slice(0,40));
   }
   btn.querySelector('.like-count').textContent=fmtN(post.likes);
-  fbSavePost(post);
+  savePosts();
 }
 
 function buildPostLink(postId){return `${location.origin}${location.pathname}#post-${postId}`;}
 
 function sharePost(postId,btn){
   const post=posts.find(p=>p.id==postId);if(!post)return;
-  post.shares++;fbSavePost(post);
+  post.shares++;savePosts();
   if(btn){const sc=btn.querySelector('.share-count');if(sc)sc.textContent=fmtN(post.shares);}
   copyToClipboard(buildPostLink(post.id));
   if(post.author!==currentUser.username)pushNotif('share',currentUser.displayName,post.id,post.title.slice(0,40));
@@ -1320,10 +1235,9 @@ function fallbackCopy(text){const ta=document.createElement('textarea');ta.value
 document.getElementById('copyPostLinkBtn').addEventListener('click',()=>{if(!currentPostId)return;copyToClipboard(buildPostLink(currentPostId));toast('🔗 Link do post copiado!');});
 
 document.getElementById('confirmCancel').addEventListener('click',()=>{document.getElementById('confirmOverlay').classList.remove('active');pendingDeleteId=null;});
-document.getElementById('confirmDelete').addEventListener('click',async ()=>{
+document.getElementById('confirmDelete').addEventListener('click',()=>{
   if(!pendingDeleteId)return;
-  await fbDeletePost(pendingDeleteId);
-  posts=posts.filter(p=>p.id!=pendingDeleteId);
+  fsDel('posts',String(pendingDeleteId));posts=posts.filter(p=>p.id!=pendingDeleteId);
   document.getElementById('confirmOverlay').classList.remove('active');pendingDeleteId=null;
   loadFeed();renderProfile(currentUser.username);toast('🗑️ Post excluído');
 });
@@ -1332,7 +1246,7 @@ function openPostFull(postId,autoPlay=false){
   const post=posts.find(p=>p.id==postId);if(!post)return;
   stopSpeech();currentPostId=postId;
   if(!post.viewedBy)post.viewedBy=[];
-  if(!post.viewedBy.includes(currentUser.id)){post.views=(post.views||0)+1;post.viewedBy.push(currentUser.id);fbSavePost(post);}
+  if(!post.viewedBy.includes(currentUser.id)){post.views=(post.views||0)+1;post.viewedBy.push(currentUser.id);savePosts();}
   document.getElementById('postFullTitleHdr').textContent=post.title;
   document.getElementById('postFullTitle').textContent=post.title;
   document.getElementById('postFullDescription').textContent=post.description;
@@ -1394,15 +1308,14 @@ document.getElementById('photoInput').addEventListener('change',e=>{
 });
 document.getElementById('removePhotoBtn').addEventListener('click',()=>{selectedPhoto=null;document.getElementById('photoInput').value='';document.getElementById('photoUploadArea').style.display='block';document.getElementById('photoPreviewWrap').style.display='none';});
 
-document.getElementById('uploadForm').addEventListener('submit',async e=>{
+document.getElementById('uploadForm').addEventListener('submit',e=>{
   e.preventDefault();
   const title=document.getElementById('postTitle').value.trim();
   const description=document.getElementById('postDescription').value.trim();
   const text=document.getElementById('postText').value.trim();
   if(!title||!description||!text){alert('Preencha título, descrição e texto!');return}
-  const newPost={id:Date.now(),author:currentUser.username||currentUser.id,authorAvatar:currentUser.avatar,authorPhoto:currentUser.avatarPhoto||null,displayName:currentUser.displayName,title,description,text,image:selectedPhoto||null,likes:0,comments:[],shares:0,views:0,likedBy:[],viewedBy:[],timestamp:new Date().toISOString()};
-  await fbSavePost(newPost);
-  posts.unshift(newPost);
+  const newPost={id:Date.now(),author:currentUser.username,authorAvatar:currentUser.avatar,authorPhoto:currentUser.avatarPhoto||null,displayName:currentUser.displayName,title,description,text,image:selectedPhoto||null,likes:0,comments:[],shares:0,views:0,likedBy:[],viewedBy:[],timestamp:new Date().toISOString()};
+  posts.unshift(newPost);fsSet('posts',String(newPost.id),newPost);
   closeUpload();switchPage('home');loadFeed();renderProfile(currentUser.username);
   toast('🎉 Post publicado com sucesso!');
 });
@@ -1510,7 +1423,7 @@ function buildCommentEl(c,post,isReply=false,parentId=null){
     if(idx===-1){c.likedBy.push(currentUser.id);c.likes=(c.likes||0)+1;e.currentTarget.classList.add('liked');}
     else{c.likedBy.splice(idx,1);c.likes=Math.max(0,(c.likes||0)-1);e.currentTarget.classList.remove('liked');}
     e.currentTarget.querySelector('.clike-count').textContent=c.likes||0;
-    fbSavePost(post);
+    savePosts();
   });
 
   if(!isReply){
@@ -1544,7 +1457,7 @@ function sendComment(){
     post.comments.push(newComment);
     if(post.author!==currentUser.username)pushNotif('comment',currentUser.displayName,post.id,post.title.slice(0,40));
   }
-  fbSavePost(post);
+  savePosts();
   input.value='';
   renderComments(post);
   loadFeed();
@@ -1581,31 +1494,19 @@ function renderExploreGrid(list){
 
 function searchPosts(q){renderExploreGrid(q?posts.filter(p=>p.title.toLowerCase().includes(q)||p.description.toLowerCase().includes(q)||p.author.toLowerCase().includes(q)):posts);}
 
-function renderUserList(allU, q) {
+function searchUsers(q){
   const container=document.getElementById('userResults');
-  const filtered=q?allU.filter(u=>u.username&&(u.username.toLowerCase().includes(q)||u.displayName.toLowerCase().includes(q))):allU;
+  const allU=getAllUsers();
+  const filtered=q?allU.filter(u=>u.username.toLowerCase().includes(q)||u.displayName.toLowerCase().includes(q)):allU;
   container.innerHTML='';
   if(filtered.length===0){container.innerHTML='<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">Nenhum usuário</div></div>';return}
   filtered.forEach(user=>{
-    if(!user.username)return;
     const isFollowing=currentUser.following&&currentUser.following.includes(user.username);
     const item=document.createElement('div');item.className='user-item';
-    item.innerHTML=`<div class="user-item-avatar">${user.avatarPhoto?`<img src="${user.avatarPhoto}" style="width:100%;height:100%;object-fit:cover">`:user.avatar||'👤'}</div><div class="user-item-info"><div class="user-item-username">@${user.username}${isVerified(user.username)?'<span class="verified-badge"></span>':''}</div><div class="user-item-sub">${user.displayName||user.username} · ${fmtN(getFollowersCount(user.username))} seguidores</div></div>${currentUser&&user.username!==currentUser.username?`<button class="user-item-follow-btn${isFollowing?' following':''}" data-username="${user.username}">${isFollowing?'Seguindo':'Seguir'}</button>`:''}`;
+    item.innerHTML=`<div class="user-item-avatar">${user.avatarPhoto?`<img src="${user.avatarPhoto}" style="width:100%;height:100%;object-fit:cover">`:user.avatar}</div><div class="user-item-info"><div class="user-item-username">@${user.username}${user.verified?'<span class="verified-badge"></span>':''}</div><div class="user-item-sub">${user.displayName} · ${fmtN(user.followersCount)} seguidores</div></div>${currentUser&&user.username!==currentUser.username?`<button class="user-item-follow-btn${isFollowing?' following':''}" data-username="${user.username}">${isFollowing?'Seguindo':'Seguir'}</button>`:''}`;
     item.addEventListener('click',e=>{if(!e.target.classList.contains('user-item-follow-btn'))goToProfile(user.username);});
     item.querySelectorAll('.user-item-follow-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();toggleFollow(btn.dataset.username,btn);}));
     container.appendChild(item);
-  });
-}
-
-function searchUsers(q){
-  const container=document.getElementById('userResults');
-  container.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Carregando...</div></div>';
-  fbLoadUsers().then(fbUsers=>{
-    accounts=fbUsers;
-    allUsernames=fbUsers.map(a=>a.username).filter(Boolean);
-    renderUserList(fbUsers, q);
-  }).catch(()=>{
-    renderUserList(getAllUsers(), q);
   });
 }
 
@@ -1637,7 +1538,7 @@ function toggleFollow(targetUsername,btn){
   }
   LS.set('currentUser',currentUser);
   const idx=accounts.findIndex(a=>a.id===currentUser.id||a.username===currentUser.username);
-  if(idx!==-1){accounts[idx]=currentUser;fbSaveUser(currentUser);}
+  if(idx!==-1){accounts[idx]=currentUser;saveAccounts();}
 
   // Atualiza TODOS os botões de seguir para esse usuário na tela, instantaneamente
   const nowFollowing=currentUser.following.includes(targetUsername);
@@ -1702,7 +1603,7 @@ function renderProfile(targetUsername){
     });
     const logoutBtn=document.createElement('button');
     logoutBtn.className='profile-btn logout-btn';logoutBtn.textContent='Sair';
-    logoutBtn.addEventListener('click',async ()=>{if(confirm('Sair?')){await window._auth.signOut();LS.rm('currentUser');LS.rm('isLoggedIn');location.reload();}});
+    logoutBtn.addEventListener('click',()=>{if(confirm('Sair?')){window._auth.signOut();LS.rm('currentUser');location.reload();}});
     actionsEl.appendChild(logoutBtn);
   }else{
     const isFollowing=currentUser.following&&currentUser.following.includes(targetUser.username);
@@ -1792,8 +1693,9 @@ document.getElementById('editProfileForm').addEventListener('submit',e=>{
   if(window.editAvatarPhoto){currentUser.avatarPhoto=window.editAvatarPhoto;window.editAvatarPhoto=null;}
   LS.set('currentUser',currentUser);
   const idx=accounts.findIndex(a=>a.id===currentUser.id);
-  if(idx!==-1){accounts[idx]=currentUser;fbSaveUser(currentUser);}
-  posts.forEach(p=>{if(p.author===currentUser.username){p.displayName=currentUser.displayName;p.authorAvatar=currentUser.avatar;p.authorPhoto=currentUser.avatarPhoto||null;fbSavePost(p);}});
+  if(idx!==-1){accounts[idx]=currentUser;saveAccounts();}
+  posts.forEach(p=>{if(p.author===currentUser.username){p.displayName=currentUser.displayName;p.authorAvatar=currentUser.avatar;p.authorPhoto=currentUser.avatarPhoto||null;}});
+  savePosts();
   document.getElementById('editProfileModal').classList.remove('active');
   renderProfile(currentUser.username);loadFeed();
   toast('✅ Perfil atualizado!');
@@ -1830,7 +1732,7 @@ document.getElementById('sendLikesBtn').addEventListener('click',()=>{
   const amt=parseInt(document.getElementById('likesAmount').value);
   if(!rawId||!amt||amt<1){toast('❌ Preencha ID e quantidade!');return}
   const post=findPostById(rawId);if(!post)return;
-  post.likes+=amt;fbSavePost(post);loadFeed();
+  post.likes+=amt;savePosts();loadFeed();
   toast(`✅ +${amt} curtidas!`);
   document.getElementById('likesPostId').value='';document.getElementById('likesAmount').value='';
 });
@@ -1840,7 +1742,7 @@ document.getElementById('sendViewsBtn').addEventListener('click',()=>{
   const amt=parseInt(document.getElementById('viewsAmount').value);
   if(!rawId||!amt||amt<1){toast('❌ Preencha ID e quantidade!');return}
   const post=findPostById(rawId);if(!post)return;
-  post.views=(post.views||0)+amt;fbSavePost(post);loadFeed();
+  post.views=(post.views||0)+amt;savePosts();loadFeed();
   toast(`✅ +${amt} visualizações!`);
   document.getElementById('viewsPostId').value='';document.getElementById('viewsAmount').value='';
 });
@@ -1854,7 +1756,7 @@ document.getElementById('addCommentsBtn').addEventListener('click',()=>{
     const nm=RND_NAMES[Math.floor(Math.random()*RND_NAMES.length)];
     post.comments.push({id:Date.now()+i,author:nm,authorAvatar:RND_AVATARS[Math.floor(Math.random()*RND_AVATARS.length)],authorPhoto:null,displayName:nm.charAt(0).toUpperCase()+nm.slice(1),text:RND_COMMENTS[Math.floor(Math.random()*RND_COMMENTS.length)],time:'agora',likes:Math.floor(Math.random()*20),likedBy:[],replies:[]});
   }
-  fbSavePost(post);loadFeed();
+  savePosts();loadFeed();
   toast(`✅ +${amt} comentários!`);
   document.getElementById('commentsPostId').value='';document.getElementById('commentsAmount').value='';
 });
@@ -1877,7 +1779,7 @@ document.getElementById('sendFollowersBtn').addEventListener('click',()=>{
   }
   if(!acc._fakeFollowersList)acc._fakeFollowersList=[];
   acc._fakeFollowersList.push(...fakeList);
-  saveUsernames();fbSaveUser(currentUser);
+  saveUsernames();saveAccounts();
   if(username===currentUser.username){currentUser._fakeFollowersList=acc._fakeFollowersList;LS.set('currentUser',currentUser);}
   renderProfile(username);
   toast(`✅ +${amt} seguidores criados para @${username}!`);
@@ -1894,8 +1796,7 @@ function openSettings(){
 
 document.getElementById('closeSettingsModal').addEventListener('click',()=>document.getElementById('settingsModal').classList.remove('active'));
 document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
-document.getElementById('settingsDB').addEventListener('click',()=>toast('☁️ Firebase ativo! Contas e posts sincronizados para todos os dispositivos.'));
-document.getElementById('settingsLogoutBtn').addEventListener('click',async ()=>{if(confirm('Sair da conta?')){await window._auth.signOut();LS.rm('currentUser');LS.rm('isLoggedIn');location.reload();}});
+document.getElementById('settingsLogoutBtn').addEventListener('click',()=>{if(confirm('Sair?')){window._auth.signOut();LS.rm('currentUser');location.reload();}});
 
 document.getElementById('settingsChangePassword').addEventListener('click',()=>{
   document.getElementById('settingsModal').classList.remove('active');
@@ -1929,7 +1830,7 @@ document.getElementById('savePasswordBtn').addEventListener('click',()=>{
   }
   LS.set('currentUser',currentUser);
   const idx=accounts.findIndex(a=>a.id===currentUser.id);
-  if(idx!==-1){accounts[idx]=currentUser;fbSaveUser(currentUser);}
+  if(idx!==-1){accounts[idx]=currentUser;saveAccounts();}
   document.getElementById('changePasswordModal').classList.remove('active');
   renderProfile(currentUser.username);
   toast('✅ Dados atualizados com sucesso!');
@@ -1951,7 +1852,7 @@ document.getElementById('savePrivacyBtn').addEventListener('click',()=>{
   currentUser._privacy.hideFollowers=document.getElementById('privHideFollowers').checked;
   LS.set('currentUser',currentUser);
   const idx=accounts.findIndex(a=>a.id===currentUser.id);
-  if(idx!==-1){accounts[idx]=currentUser;fbSaveUser(currentUser);}
+  if(idx!==-1){accounts[idx]=currentUser;saveAccounts();}
   document.getElementById('privacyModal').classList.remove('active');
   renderProfile(currentUser.username);
   toast('🔒 Privacidade salva!');
@@ -2071,6 +1972,25 @@ function startSpeech(post){
 
 </script>
 
-<!-- BANCO DE DADOS: agora gerenciado pelo Firebase automaticamente -->
+
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+        <label class="form-label">🔗 Conectar a outro banco</label>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Cole o ID de outro dispositivo para sincronizar as mesmas contas:</p>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="dbIdInput" placeholder="Cole o ID aqui" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:11px;font-family:monospace;outline:none">
+          <button onclick="connectDb()" style="background:linear-gradient(135deg,#10b981,#059669);border:none;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px">Conectar</button>
+        </div>
+        <div id="dbConnectMsg" style="font-size:12px;margin-top:10px;display:none;padding:8px 12px;border-radius:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ===== BANCO DE DADOS - SETTINGS =====
+
+</script>
 </body>
 </html>
