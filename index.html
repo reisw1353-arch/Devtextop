@@ -875,26 +875,41 @@ async function bootApp() {
 
   window._auth.onAuthStateChanged(async (firebaseUser) => {
     if (firebaseUser) {
+      // Tenta usar cache local primeiro para ser rápido
+      const cached = LS.get('currentUser');
+      if (cached && cached.id === firebaseUser.uid) {
+        currentUser = cached; isLoggedIn = true;
+        showDBLoading(false);
+        document.getElementById('authScreen').classList.add('hidden');
+        initApp();
+        // Carrega dados em background
+        Promise.all([fbLoadUsers(),fbLoadPosts(),fbLoadVerified()]).then(([u,p,v])=>{
+          accounts=u;posts=p;verifiedUsers=v;allUsernames=u.map(a=>a.username);
+          loadFeed();loadExploreGrid();
+          fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
+        }).catch(()=>{});
+        return;
+      }
       setLoadMsg('Carregando dados...');
       try {
         const [fbUsers, fbPosts, fbVerified, snapUser] = await Promise.all([
           fbLoadUsers(), fbLoadPosts(), fbLoadVerified(),
           fbGetUser(firebaseUser.uid)
         ]);
-        accounts = fbUsers; posts = fbPosts; verifiedUsers = fbVerified;
-        allUsernames = accounts.map(a => a.username);
+        accounts=fbUsers; posts=fbPosts; verifiedUsers=fbVerified;
+        allUsernames=accounts.map(a=>a.username);
         ensureDefaults(); migrateComments();
         if (snapUser) {
-          currentUser = snapUser; isLoggedIn = true;
-          LS.set('currentUser', currentUser); LS.set('isLoggedIn', true);
+          currentUser=snapUser; isLoggedIn=true;
+          LS.set('currentUser',currentUser); LS.set('isLoggedIn',true);
           showDBLoading(false);
           document.getElementById('authScreen').classList.add('hidden');
           document.getElementById('setupScreen').classList.remove('active');
           initApp();
-          fbListenPosts(ps => { posts = ps; loadFeed(); loadExploreGrid(); });
+          fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
         } else {
           showDBLoading(false);
-          window._pendingGoogleUser = firebaseUser;
+          window._pendingGoogleUser=firebaseUser;
           document.getElementById('authScreen').classList.add('hidden');
           document.getElementById('setupScreen').classList.add('active');
         }
@@ -903,7 +918,6 @@ async function bootApp() {
         document.getElementById('authScreen').classList.remove('hidden');
       }
     } else {
-      // Sem login — só mostra tela de auth, não tenta buscar nada
       showDBLoading(false);
       document.getElementById('authScreen').classList.remove('hidden');
     }
@@ -1025,10 +1039,13 @@ document.getElementById('setupForm').addEventListener('submit',async e=>{
     accounts.push(acc);allUsernames.push(username);
     document.getElementById('setupScreen').classList.remove('active');
     window._pendingGoogleUser=null;
+    // Faz login imediatamente
+    currentUser=acc;isLoggedIn=true;
+    LS.set('currentUser',acc);LS.set('isLoggedIn',true);
+    initApp();
+    fbListenPosts(ps=>{posts=ps;loadFeed();loadExploreGrid();});
   } catch(e2){
     alert('Erro ao salvar perfil: '+e2.message);
-    document.getElementById('authScreen').classList.remove('hidden');
-    document.getElementById('setupScreen').classList.remove('active');
   }
 });
 
@@ -1043,6 +1060,8 @@ function finalizeLogin(acc){
 // ===== BOOT COM CLOUD =====
 
 function initApp(){
+  if(!currentUser){console.error('initApp sem currentUser!');return;}
+  if(!currentUser.username)currentUser.username=currentUser.id||'usuario';
   loadFeed();renderNotifications();renderProfile(currentUser.username);
   loadExploreGrid();switchPage('home');updateNotifBadge();
 }
@@ -1381,7 +1400,7 @@ document.getElementById('uploadForm').addEventListener('submit',async e=>{
   const description=document.getElementById('postDescription').value.trim();
   const text=document.getElementById('postText').value.trim();
   if(!title||!description||!text){alert('Preencha título, descrição e texto!');return}
-  const newPost={id:Date.now(),author:currentUser.username,authorAvatar:currentUser.avatar,authorPhoto:currentUser.avatarPhoto||null,displayName:currentUser.displayName,title,description,text,image:selectedPhoto||null,likes:0,comments:[],shares:0,views:0,likedBy:[],viewedBy:[],timestamp:new Date().toISOString()};
+  const newPost={id:Date.now(),author:currentUser.username||currentUser.id,authorAvatar:currentUser.avatar,authorPhoto:currentUser.avatarPhoto||null,displayName:currentUser.displayName,title,description,text,image:selectedPhoto||null,likes:0,comments:[],shares:0,views:0,likedBy:[],viewedBy:[],timestamp:new Date().toISOString()};
   await fbSavePost(newPost);
   posts.unshift(newPost);
   closeUpload();switchPage('home');loadFeed();renderProfile(currentUser.username);
