@@ -15,8 +15,7 @@
   if(typeof firebase==='undefined'){document.write('<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0f;color:#ef4444;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:14px;text-align:center;padding:20px;z-index:99999">❌ Erro ao carregar Firebase.<br>Verifique sua conexão com a internet e recarregue a página.</div>');return;}
   firebase.initializeApp(cfg);
   window._auth=firebase.auth();
-  window._db=firebase.firestore();
-  window._db.settings({ experimentalForceLongPolling: true, merge: true });
+  // Firestore SDK não usado - usando REST API
 })();
 </script>
 <style>
@@ -724,53 +723,118 @@ function waitForFB() {
   return Promise.resolve();
 }
 
-// ===== FIREBASE COMPAT HELPERS =====
+// ===== FIRESTORE REST API (sem SDK, sem bug offline) =====
+const FB_PROJECT = 'drama-b829c';
+const FB_BASE = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
+
+async function fbToken() {
+  try { return await window._auth.currentUser?.getIdToken(); } catch(e) { return null; }
+}
+
+function fsToJs(fields) {
+  if (!fields) return {};
+  const obj = {};
+  for (const [k, v] of Object.entries(fields)) {
+    if (v.stringValue !== undefined) obj[k] = v.stringValue;
+    else if (v.integerValue !== undefined) obj[k] = Number(v.integerValue);
+    else if (v.doubleValue !== undefined) obj[k] = v.doubleValue;
+    else if (v.booleanValue !== undefined) obj[k] = v.booleanValue;
+    else if (v.nullValue !== undefined) obj[k] = null;
+    else if (v.arrayValue !== undefined) obj[k] = (v.arrayValue.values||[]).map(i=>fsToJs({_:i})['_']);
+    else if (v.mapValue !== undefined) obj[k] = fsToJs(v.mapValue.fields||{});
+    else obj[k] = null;
+  }
+  return obj;
+}
+
+function jsToFs(obj) {
+  if (obj === null || obj === undefined) return { nullValue: null };
+  if (typeof obj === 'boolean') return { booleanValue: obj };
+  if (typeof obj === 'number') return Number.isInteger(obj) ? { integerValue: String(obj) } : { doubleValue: obj };
+  if (typeof obj === 'string') return { stringValue: obj };
+  if (Array.isArray(obj)) return { arrayValue: { values: obj.map(jsToFs) } };
+  if (typeof obj === 'object') {
+    const fields = {};
+    for (const [k,v] of Object.entries(obj)) fields[k] = jsToFs(v);
+    return { mapValue: { fields } };
+  }
+  return { stringValue: String(obj) };
+}
+
+function objToFsFields(obj) {
+  const fields = {};
+  for (const [k,v] of Object.entries(obj)) fields[k] = jsToFs(v);
+  return fields;
+}
+
+async function fsGet(col, docId) {
+  const token = await fbToken();
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  const r = await fetch(`${FB_BASE}/${col}/${docId}`, { headers });
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d.fields ? fsToJs(d.fields) : null;
+}
+
+async function fsList(col) {
+  const token = await fbToken();
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  const r = await fetch(`${FB_BASE}/${col}?pageSize=500`, { headers });
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.documents||[]).map(doc => fsToJs(doc.fields||{}));
+}
+
+async function fsSet(col, docId, obj) {
+  const token = await fbToken();
+  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) };
+  const fields = objToFsFields(obj);
+  const r = await fetch(`${FB_BASE}/${col}/${docId}`, {
+    method: 'PATCH', headers, body: JSON.stringify({ fields })
+  });
+  return r.ok;
+}
+
+async function fsDelete(col, docId) {
+  const token = await fbToken();
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  await fetch(`${FB_BASE}/${col}/${docId}`, { method: 'DELETE', headers });
+}
+
 async function fbSavePost(post) {
-  try { await window._db.collection('posts').doc(String(post.id)).set(post); }
-  catch(e) { console.error('fbSavePost', e); }
+  try { await fsSet('posts', String(post.id), post); } catch(e) { console.error(e); }
 }
-
 async function fbDeletePost(postId) {
-  try { await window._db.collection('posts').doc(String(postId)).delete(); }
-  catch(e) {}
+  try { await fsDelete('posts', String(postId)); } catch(e) {}
 }
-
 async function fbSaveUser(acc) {
-  try {
-    const safe = JSON.parse(JSON.stringify(acc));
-    await window._db.collection('users').doc(acc.username).set(safe, { merge: true });
-  } catch(e) { console.error('fbSaveUser', e); }
+  try { await fsSet('users', acc.id || acc.username, JSON.parse(JSON.stringify(acc))); } catch(e) { console.error(e); }
 }
-
 async function fbSaveVerified() {
-  try { await window._db.collection('meta').doc('verified').set({ list: verifiedUsers }); }
-  catch(e) {}
+  try { await fsSet('meta', 'verified', { list: verifiedUsers }); } catch(e) {}
 }
-
 async function fbLoadPosts() {
   try {
-    const snap = await window._db.collection('posts').orderBy('timestamp','desc').get();
-    return snap.docs.map(d => d.data());
+    const ps = await fsList('posts');
+    return ps.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
   } catch(e) { return []; }
 }
-
 async function fbLoadUsers() {
-  try {
-    const snap = await window._db.collection('users').get();
-    return snap.docs.map(d => d.data());
-  } catch(e) { return []; }
+  try { return await fsList('users'); } catch(e) { return []; }
 }
-
 async function fbLoadVerified() {
   try {
-    const snap = await window._db.collection('meta').doc('verified').get();
-    return snap.exists ? (snap.data().list || []) : [];
+    const d = await fsGet('meta', 'verified');
+    return d?.list || [];
   } catch(e) { return []; }
 }
-
+async function fbGetUser(uid) {
+  return await fsGet('users', uid);
+}
 function fbListenPosts(cb) {
-  return window._db.collection('posts').orderBy('timestamp','desc')
-    .onSnapshot(snap => { cb(snap.docs.map(d => d.data())); });
+  // REST não tem realtime — polling a cada 15s
+  cb && fbLoadPosts().then(cb);
+  return setInterval(() => fbLoadPosts().then(cb), 15000);
 }
 
 let _saveTimer = null;
@@ -815,13 +879,13 @@ async function bootApp() {
       try {
         const [fbUsers, fbPosts, fbVerified, snapUser] = await Promise.all([
           fbLoadUsers(), fbLoadPosts(), fbLoadVerified(),
-          window._db.collection('users').doc(firebaseUser.uid).get()
+          fbGetUser(firebaseUser.uid)
         ]);
         accounts = fbUsers; posts = fbPosts; verifiedUsers = fbVerified;
         allUsernames = accounts.map(a => a.username);
         ensureDefaults(); migrateComments();
-        if (snapUser.exists) {
-          currentUser = snapUser.data(); isLoggedIn = true;
+        if (snapUser) {
+          currentUser = snapUser; isLoggedIn = true;
           LS.set('currentUser', currentUser); LS.set('isLoggedIn', true);
           showDBLoading(false);
           document.getElementById('authScreen').classList.add('hidden');
@@ -915,8 +979,8 @@ async function handleGoogleLogin(){
     const provider=new firebase.auth.GoogleAuthProvider();
     const result=await window._auth.signInWithPopup(provider);
     const gu=result.user;
-    const snap=await window._db.collection('users').doc(gu.uid).get();
-    if(!snap.exists){
+    const snap=await fbGetUser(gu.uid);
+    if(!snap){
       window._pendingGoogleUser=gu;
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('setupScreen').classList.add('active');
@@ -957,7 +1021,7 @@ document.getElementById('setupForm').addEventListener('submit',async e=>{
   const acc={id:gu.uid,username,displayName:gu.displayName||username,avatar,avatarPhoto:gu.photoURL||null,bio,following:[],followers:[],_email:gu.email};
   if(window._setupAvatarPhoto){acc.avatarPhoto=window._setupAvatarPhoto;window._setupAvatarPhoto=null;}
   try {
-    await window._db.collection('users').doc(gu.uid).set(acc);
+    await fsSet('users', gu.uid, acc);
     accounts.push(acc);allUsernames.push(username);
     document.getElementById('setupScreen').classList.remove('active');
     window._pendingGoogleUser=null;
